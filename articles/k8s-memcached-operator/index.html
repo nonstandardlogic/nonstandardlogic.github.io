@@ -1,179 +1,636 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Cloud ecosystem technical articles">
+      
+      
         <link rel="canonical" href="https://nonstandardlogic.github.io/articles/k8s-memcached-operator/">
-        <link rel="shortcut icon" href="../../img/favicon.ico">
+      
+      
+        <meta name="author" content="Non Standard Logic authors">
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.8">
+    
+    
+      
         <title>Memcache Kubernetes Operator - Non Standard logic Blog</title>
-        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="../../css/font-awesome-4.5.0.css" rel="stylesheet">
-        <link href="../../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="../../css/highlight.css">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-	
-	<script src="../../js/jquery-1.10.2.min.js"></script>
-        <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
-    </head>
-
-    <body>
-
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="../..">Non Standard logic Blog</a>
-        </div>
-
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                    <li >
-                        <a href="../..">Home</a>
-                    </li>
-                    <li >
-                        <a href="../../projects/">Projects</a>
-                    </li>
-                    <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Articles <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            
-<li class="active">
-    <a href="./">Memcache Kubernetes Operator</a>
-</li>
-                        </ul>
-                    </li>
-                </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                        <i class="fa fa-search"></i> Search
-                    </a>
-                </li>
-                    <li >
-                        <a rel="next" href="../../projects/">
-                            <i class="fa fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li class="disabled">
-                        <a rel="prev" >
-                            Next <i class="fa fa-arrow-right"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/nonstandardlogic.github.io/">
-                                <i class="fa fa-github"></i>GitHub
-                        </a>
-                    </li>
-            </ul>
-        </div>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.01afc2df.min.css">
+      
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#create-project" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://nonstandardlogic.github.io/" title="Non Standard logic Blog" class="md-header-nav__button md-logo" aria-label="Non Standard logic Blog">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            Non Standard logic Blog
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Memcache Kubernetes Operator
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/nonstandardlogic.github.io/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://nonstandardlogic.github.io/" title="Non Standard logic Blog" class="md-nav__button md-logo" aria-label="Non Standard logic Blog">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
 
-        <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#create-project">Create Project</a></li>
-        <li class="main "><a href="#create-api">Create API</a></li>
-        <li class="main "><a href="#install-kubebuilder">Install Kubebuilder</a></li>
-        <li class="main "><a href="#api-definition">API Definition</a></li>
-        <li class="main "><a href="#generate-crd">Generate CRD</a></li>
-        <li class="main "><a href="#update-cr">Update CR</a></li>
-        <li class="main "><a href="#building-and-pushing-to-docker-registry">Building and pushing to Docker registry</a></li>
-        <li class="main "><a href="#deploy-crds">Deploy CRDS</a></li>
-        <li class="main "><a href="#check-the-operator">Check the operator</a></li>
-        <li class="main "><a href="#check-crds">Check CRDS</a></li>
-        <li class="main "><a href="#running-the-operator">Running the Operator</a></li>
-        <li class="main "><a href="#check-operator-namespace">Check Operator namespace</a></li>
-        <li class="main "><a href="#check-operator-logs">Check Operator logs</a></li>
-        <li class="main "><a href="#apply-example-cr">Apply example CR</a></li>
-        <li class="main "><a href="#check-resources">Check resources</a></li>
-        <li class="main "><a href="#cleanup-resources">Cleanup resources</a></li>
-        <li class="main "><a href="#cleanup-resources_1">Cleanup resources</a></li>
+    </a>
+    Non Standard logic Blog
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/nonstandardlogic.github.io/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../projects/" title="Projects" class="md-nav__link">
+      Projects
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      Articles
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Articles" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Articles
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Memcache Kubernetes Operator
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
+        </span>
+      </label>
+    
+    <a href="./" title="Memcache Kubernetes Operator" class="md-nav__link md-nav__link--active">
+      Memcache Kubernetes Operator
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#create-project" class="md-nav__link">
+    Create Project
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-api" class="md-nav__link">
+    Create API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-kubebuilder" class="md-nav__link">
+    Install Kubebuilder
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-definition" class="md-nav__link">
+    API Definition
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generate-crd" class="md-nav__link">
+    Generate CRD
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-cr" class="md-nav__link">
+    Update CR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-and-pushing-to-docker-registry" class="md-nav__link">
+    Building and pushing to Docker registry
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-crds" class="md-nav__link">
+    Deploy CRDS
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-the-operator" class="md-nav__link">
+    Check the operator
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-crds" class="md-nav__link">
+    Check CRDS
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-operator" class="md-nav__link">
+    Running the Operator
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-operator-namespace" class="md-nav__link">
+    Check Operator namespace
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-operator-logs" class="md-nav__link">
+    Check Operator logs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#apply-example-cr" class="md-nav__link">
+    Apply example CR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-resources" class="md-nav__link">
+    Check resources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cleanup-resources" class="md-nav__link">
+    Cleanup resources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cleanup-resources_1" class="md-nav__link">
+    Cleanup resources
+  </a>
+  
+</li>
+      
     </ul>
-</div></div>
-                <div class="col-md-9" role="main">
+  
+</nav>
+    
+  </li>
 
-<h3 id="create-project">Create Project</h3>
-<pre><code>$ mkdir $GOPATH/src/github.com/nonstandardlogic
-$ mkdir $GOPATH/src/github.com/nonstandardlogic/memcached-operator
-$ cd  $GOPATH/src/github.com/memcached-operator
+        
+      </ul>
+    </nav>
+  </li>
 
-$ operator-sdk init --domain=example.com
-Error: failed to initialize project with version "3-alpha": error finding current repository: could not determine repository path from module data, package data, or by initializing a module: go: cannot determine module path for source directory /home/serge/go/memcached-operator (outside GOPATH, module path must be specified)
-</code></pre>
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#create-project" class="md-nav__link">
+    Create Project
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-api" class="md-nav__link">
+    Create API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-kubebuilder" class="md-nav__link">
+    Install Kubebuilder
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-definition" class="md-nav__link">
+    API Definition
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generate-crd" class="md-nav__link">
+    Generate CRD
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-cr" class="md-nav__link">
+    Update CR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-and-pushing-to-docker-registry" class="md-nav__link">
+    Building and pushing to Docker registry
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-crds" class="md-nav__link">
+    Deploy CRDS
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-the-operator" class="md-nav__link">
+    Check the operator
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-crds" class="md-nav__link">
+    Check CRDS
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-operator" class="md-nav__link">
+    Running the Operator
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-operator-namespace" class="md-nav__link">
+    Check Operator namespace
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-operator-logs" class="md-nav__link">
+    Check Operator logs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#apply-example-cr" class="md-nav__link">
+    Apply example CR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-resources" class="md-nav__link">
+    Check resources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cleanup-resources" class="md-nav__link">
+    Cleanup resources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cleanup-resources_1" class="md-nav__link">
+    Cleanup resources
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/nonstandardlogic.github.io/edit/master/docs/articles/k8s-memcached-operator.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                  <h1>Memcache Kubernetes Operator</h1>
+                
+                <h3 id="create-project">Create Project</h3>
+<div class="codehilite"><pre><span></span><code>$ mkdir <span class="nv">$GOPATH</span>/src/github.com/nonstandardlogic
+$ mkdir <span class="nv">$GOPATH</span>/src/github.com/nonstandardlogic/memcached-operator
+$ <span class="nb">cd</span>  <span class="nv">$GOPATH</span>/src/github.com/memcached-operator
+
+$ operator-sdk init --domain<span class="o">=</span>example.com
+Error: failed to initialize project with version <span class="s2">&quot;3-alpha&quot;</span>: error finding current repository: could not determine repository path from module data, package data, or by initializing a module: go: cannot determine module path <span class="k">for</span> <span class="nb">source</span> directory /home/serge/go/memcached-operator <span class="o">(</span>outside GOPATH, module path must be specified<span class="o">)</span>
+</code></pre></div>
+
+
 <p>Example usage:
         'go mod init example.com/m' to initialize a v0 or v1 module
         'go mod init example.com/m/v2' to initialize a v2 module</p>
 <p>Then</p>
-<pre><code>$ go mod init example.com/m/v2
+<div class="codehilite"><pre><span></span><code>$ go mod init example.com/m/v2
 go: creating new go.mod: module example.com/m/v2
-</code></pre>
+</code></pre></div>
+
+
 <p>Create the project</p>
-<pre><code>$ operator-sdk init --domain example.com --license apache2 --owner "NSL Team"
-Writing scaffold for you to edit...
+<div class="codehilite"><pre><span></span><code>$ operator-sdk init --domain example.com --license apache2 --owner <span class="s2">&quot;NSL Team&quot;</span>
+Writing scaffold <span class="k">for</span> you to edit...
 Get controller runtime:
 $ go get sigs.k8s.io/controller-runtime@v0.6.2
 Update go.mod:
 $ go mod tidy
 Running make:
 $ make
-/home/serge/go/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+/home/serge/go/bin/controller-gen object:headerFile<span class="o">=</span><span class="s2">&quot;hack/boilerplate.go.txt&quot;</span> <span class="nv">paths</span><span class="o">=</span><span class="s2">&quot;./...&quot;</span>
 go fmt ./...
 go vet ./...
 go build -o bin/manager main.go
 Next: define a resource with:
 $ operator-sdk create api
-</code></pre>
+</code></pre></div>
+
+
 <h3 id="create-api">Create API</h3>
-<pre><code>$ operator-sdk create api --group cache --version v1 --kind Memcached --resource=true --controller=true
-Writing scaffold for you to edit...
+<div class="codehilite"><pre><span></span><code>$ operator-sdk create api --group cache --version v1 --kind Memcached --resource<span class="o">=</span><span class="nb">true</span> --controller<span class="o">=</span><span class="nb">true</span>
+Writing scaffold <span class="k">for</span> you to edit...
 api/v1/memcached_types.go
 controllers/memcached_controller.go
 Running make:
 $ make
-/home/serge/go/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+/home/serge/go/bin/controller-gen object:headerFile<span class="o">=</span><span class="s2">&quot;hack/boilerplate.go.txt&quot;</span> <span class="nv">paths</span><span class="o">=</span><span class="s2">&quot;./...&quot;</span>
 go fmt ./...
 go vet ./...
 go build -o bin/manager main.go
 
 
 $ make manifests
-/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-</code></pre>
+/home/serge/go/bin/controller-gen <span class="s2">&quot;crd:trivialVersions=true&quot;</span> rbac:roleName<span class="o">=</span>manager-role webhook <span class="nv">paths</span><span class="o">=</span><span class="s2">&quot;./...&quot;</span> output:crd:artifacts:config<span class="o">=</span>config/crd/bases
+</code></pre></div>
+
+
 <h3 id="install-kubebuilder">Install Kubebuilder</h3>
 <p>( https://book.kubebuilder.io/quick-start.html)</p>
-<pre><code>s$ os=$(go env GOOS)
-$ arch=$(go env GOARCH)
-$ curl -L https://go.kubebuilder.io/dl/2.3.1/${os}/${arch} | tar -xz -C /tmp/
-% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                Dload  Upload   Total   Spent    Left  Speed
-100    68  100    68    0     0    163      0 --:--:-- --:--:-- --:--:--   163
-100   124  100   124    0     0    272      0 --:--:-- --:--:-- --:--:--   272
-100   649  100   649    0     0    719      0 --:--:-- --:--:-- --:--:--  2021
-100 54.8M  100 54.8M    0     0  3701k      0  0:00:15  0:00:15 --:--:-- 4395k
+<div class="codehilite"><pre><span></span><code><span class="s s-Atom">s$</span> <span class="s s-Atom">os=</span><span class="err">$</span><span class="p">(</span><span class="s s-Atom">go</span> <span class="s s-Atom">env</span> <span class="nv">GOOS</span><span class="p">)</span>
+<span class="err">$</span> <span class="s s-Atom">arch=</span><span class="err">$</span><span class="p">(</span><span class="s s-Atom">go</span> <span class="s s-Atom">env</span> <span class="nv">GOARCH</span><span class="p">)</span>
+<span class="err">$</span> <span class="s s-Atom">curl</span> <span class="o">-</span><span class="nv">L</span> <span class="nn">https</span><span class="p">:</span><span class="o">//</span><span class="s s-Atom">go</span><span class="p">.</span><span class="s s-Atom">kubebuilder</span><span class="p">.</span><span class="s s-Atom">io</span><span class="o">/</span><span class="s s-Atom">dl</span><span class="o">/</span><span class="mf">2.3.1</span><span class="s s-Atom">/</span><span class="err">$</span><span class="p">{</span><span class="s s-Atom">os</span><span class="p">}</span><span class="s s-Atom">/</span><span class="err">$</span><span class="p">{</span><span class="s s-Atom">arch</span><span class="p">}</span> <span class="p">|</span> <span class="s s-Atom">tar</span> <span class="o">-</span><span class="s s-Atom">xz</span> <span class="o">-</span><span class="nv">C</span> <span class="o">/</span><span class="s s-Atom">tmp</span><span class="o">/</span>
+<span class="c1">% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</span>
+                                <span class="nv">Dload</span>  <span class="nv">Upload</span>   <span class="nv">Total</span>   <span class="nv">Spent</span>    <span class="nv">Left</span>  <span class="nv">Speed</span>
+<span class="mi">100</span>    <span class="mi">68</span>  <span class="mi">100</span>    <span class="mi">68</span>    <span class="mi">0</span>     <span class="mi">0</span>    <span class="mi">163</span>      <span class="mi">0</span> <span class="s s-Atom">--:--:--</span> <span class="s s-Atom">--:--:--</span> <span class="s s-Atom">--:--:--</span>   <span class="mi">163</span>
+<span class="mi">100</span>   <span class="mi">124</span>  <span class="mi">100</span>   <span class="mi">124</span>    <span class="mi">0</span>     <span class="mi">0</span>    <span class="mi">272</span>      <span class="mi">0</span> <span class="s s-Atom">--:--:--</span> <span class="s s-Atom">--:--:--</span> <span class="s s-Atom">--:--:--</span>   <span class="mi">272</span>
+<span class="mi">100</span>   <span class="mi">649</span>  <span class="mi">100</span>   <span class="mi">649</span>    <span class="mi">0</span>     <span class="mi">0</span>    <span class="mi">719</span>      <span class="mi">0</span> <span class="s s-Atom">--:--:--</span> <span class="s s-Atom">--:--:--</span> <span class="s s-Atom">--:--:--</span>  <span class="mi">2021</span>
+<span class="mi">100</span> <span class="mf">54.8</span><span class="nv">M</span>  <span class="mi">100</span> <span class="mf">54.8</span><span class="nv">M</span>    <span class="mi">0</span>     <span class="mi">0</span>  <span class="mi">3701</span><span class="s s-Atom">k</span>      <span class="mi">0</span>  <span class="mi">0</span><span class="s s-Atom">:</span><span class="mi">00</span><span class="s s-Atom">:</span><span class="mi">15</span>  <span class="mi">0</span><span class="s s-Atom">:</span><span class="mi">00</span><span class="s s-Atom">:</span><span class="mi">15</span> <span class="s s-Atom">--:--:--</span> <span class="mi">4395</span><span class="s s-Atom">k</span>
 
-$ sudo mv /tmp/kubebuilder_2.3.1_${os}_${arch} /usr/local/kubebuilder
-$ export PATH=$PATH:/usr/local/kubebuilder/bin
-</code></pre>
+<span class="err">$</span> <span class="s s-Atom">sudo</span> <span class="s s-Atom">mv</span> <span class="o">/</span><span class="s s-Atom">tmp</span><span class="o">/</span><span class="s s-Atom">kubebuilder_2</span><span class="mf">.3.1</span><span class="k">_</span><span class="err">$</span><span class="p">{</span><span class="s s-Atom">os</span><span class="p">}</span><span class="k">_</span><span class="err">$</span><span class="p">{</span><span class="s s-Atom">arch</span><span class="p">}</span> <span class="o">/</span><span class="s s-Atom">usr</span><span class="o">/</span><span class="s s-Atom">local</span><span class="o">/</span><span class="s s-Atom">kubebuilder</span>
+<span class="err">$</span> <span class="s s-Atom">export</span> <span class="nv">PATH</span><span class="s s-Atom">=</span><span class="err">$</span><span class="nv">PATH</span><span class="s s-Atom">:/usr</span><span class="o">/</span><span class="s s-Atom">local</span><span class="o">/</span><span class="s s-Atom">kubebuilder</span><span class="o">/</span><span class="s s-Atom">bin</span>
+</code></pre></div>
+
+
 <h3 id="api-definition">API Definition</h3>
 <p>Update the api/v1alpha1/memcached_types.go file:
     // MemcachedSpec defines the desired state of Memcached
@@ -182,63 +639,73 @@ $ export PATH=$PATH:/usr/local/kubebuilder/bin
         // Size is the size of the memcached deployment
         Size int32 <code>json:"size"</code>
     }</p>
-<pre><code>// MemcachedStatus defines the observed state of Memcached
-type MemcachedStatus struct {
-    // Nodes are the names of the memcached pods
-    Nodes []string `json:"nodes"`
-}
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="err">// MemcachedStatus defines the observed state of Memcached</span>
+<span class="err">type MemcachedStatus struct {</span>
+<span class="err">    // Nodes are the names of the memcached pods</span>
+<span class="err">    Nodes []string `json:&quot;nodes&quot;`</span>
+<span class="err">}</span>
+</code></pre></div>
+
+
 <h3 id="generate-crd">Generate CRD</h3>
-<pre><code>$ make manifests
-/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-</code></pre>
+<div class="codehilite"><pre><span></span><code>$ make manifests
+/home/serge/go/bin/controller-gen <span class="s2">&quot;crd:trivialVersions=true&quot;</span> rbac:roleName<span class="o">=</span>manager-role webhook <span class="nv">paths</span><span class="o">=</span><span class="s2">&quot;./...&quot;</span> output:crd:artifacts:config<span class="o">=</span>config/crd/bases
+</code></pre></div>
+
+
 <h3 id="update-cr">Update CR</h3>
 <p>update the CR sample in <code>config/samples/cache_v1_memcached.yaml</code> to set the attribute defined:</p>
-<pre><code>apiVersion: cache.example.com/v1
-kind: Memcached
-metadata:
-name: memcached-sample
-spec:
-# Add fields here
-size: 1
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">apiVersion</span><span class="o">:</span> <span class="n">cache</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">com</span><span class="o">/</span><span class="n">v1</span>
+<span class="n">kind</span><span class="o">:</span> <span class="n">Memcached</span>
+<span class="n">metadata</span><span class="o">:</span>
+<span class="n">name</span><span class="o">:</span> <span class="n">memcached</span><span class="o">-</span><span class="n">sample</span>
+<span class="n">spec</span><span class="o">:</span>
+<span class="err">#</span> <span class="n">Add</span> <span class="n">fields</span> <span class="n">here</span>
+<span class="n">size</span><span class="o">:</span> <span class="mi">1</span>
+</code></pre></div>
+
+
 <h3 id="building-and-pushing-to-docker-registry">Building and pushing to Docker registry</h3>
-<pre><code>$ make docker-build docker-push IMG=nonstandardlogic/memcached-operator
-/home/serge/go/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+<div class="codehilite"><pre><span></span><code>$ make docker-build docker-push <span class="nv">IMG</span><span class="o">=</span>nonstandardlogic/memcached-operator
+/home/serge/go/bin/controller-gen object:headerFile<span class="o">=</span><span class="s2">&quot;hack/boilerplate.go.txt&quot;</span> <span class="nv">paths</span><span class="o">=</span><span class="s2">&quot;./...&quot;</span>
 go fmt ./...
 go vet ./...
-/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-go test ./... -coverprofile cover.out
-?       github.com/nonstandardlogic/memcached-operator  [no test files]
-?       github.com/nonstandardlogic/memcached-operator/api/v1   [no test files]
-ok      github.com/nonstandardlogic/memcached-operator/controllers      5.131s  coverage: 0.0% of statements
+/home/serge/go/bin/controller-gen <span class="s2">&quot;crd:trivialVersions=true&quot;</span> rbac:roleName<span class="o">=</span>manager-role webhook <span class="nv">paths</span><span class="o">=</span><span class="s2">&quot;./...&quot;</span> output:crd:artifacts:config<span class="o">=</span>config/crd/bases
+go <span class="nb">test</span> ./... -coverprofile cover.out
+?       github.com/nonstandardlogic/memcached-operator  <span class="o">[</span>no <span class="nb">test</span> files<span class="o">]</span>
+?       github.com/nonstandardlogic/memcached-operator/api/v1   <span class="o">[</span>no <span class="nb">test</span> files<span class="o">]</span>
+ok      github.com/nonstandardlogic/memcached-operator/controllers      <span class="m">5</span>.131s  coverage: <span class="m">0</span>.0% of statements
 docker build . -t nonstandardlogic/memcached-operator
-Sending build context to Docker daemon  44.48MB
-Step 1/14 : FROM golang:1.13 as builder
+Sending build context to Docker daemon  <span class="m">44</span>.48MB
+Step <span class="m">1</span>/14 : FROM golang:1.13 as builder
 ---&gt; d6f3656320fe
-Step 2/14 : WORKDIR /workspace
+Step <span class="m">2</span>/14 : WORKDIR /workspace
 ...
 1d44b27e08d8: Pushed
 84ff92691f90: Pushed
 d72a74c56330: Pushed
-latest: digest: sha256:b7074c024bfa691255788566b768a3f3cb0b4bc8e2e0062cb8d6dbd0c617749a size: 945
-</code></pre>
+latest: digest: sha256:b7074c024bfa691255788566b768a3f3cb0b4bc8e2e0062cb8d6dbd0c617749a size: <span class="m">945</span>
+</code></pre></div>
+
+
 <h3 id="deploy-crds">Deploy CRDS</h3>
-<pre><code>$ make install
-/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-/home/serge/go/bin/kustomize build config/crd | kubectl apply -f -
+<div class="codehilite"><pre><span></span><code>$ make install
+/home/serge/go/bin/controller-gen <span class="s2">&quot;crd:trivialVersions=true&quot;</span> rbac:roleName<span class="o">=</span>manager-role webhook <span class="nv">paths</span><span class="o">=</span><span class="s2">&quot;./...&quot;</span> output:crd:artifacts:config<span class="o">=</span>config/crd/bases
+/home/serge/go/bin/kustomize build config/crd <span class="p">|</span> kubectl apply -f -
 customresourcedefinition.apiextensions.k8s.io/memcacheds.cache.example.com created
-</code></pre>
+</code></pre></div>
+
+
 <h3 id="check-the-operator">Check the operator</h3>
 <p>$ kubectl api-resources | grep memcached
 memcacheds                                     cache.example.com              true         Memcached</p>
 <h3 id="check-crds">Check CRDS</h3>
 <p>$ kubectl describe crds memcacheds</p>
 <h3 id="running-the-operator">Running the Operator</h3>
-<pre><code>$ make deploy IMG=nonstandardlogic/memcached-operator
-/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-cd config/manager &amp;&amp; /home/serge/go/bin/kustomize edit set image controller=nonstandardlogic/memcached-operator
-/home/serge/go/bin/kustomize build config/default | kubectl apply -f -
+<div class="codehilite"><pre><span></span><code>$ make deploy <span class="nv">IMG</span><span class="o">=</span>nonstandardlogic/memcached-operator
+/home/serge/go/bin/controller-gen <span class="s2">&quot;crd:trivialVersions=true&quot;</span> rbac:roleName<span class="o">=</span>manager-role webhook <span class="nv">paths</span><span class="o">=</span><span class="s2">&quot;./...&quot;</span> output:crd:artifacts:config<span class="o">=</span>config/crd/bases
+<span class="nb">cd</span> config/manager <span class="o">&amp;&amp;</span> /home/serge/go/bin/kustomize edit <span class="nb">set</span> image <span class="nv">controller</span><span class="o">=</span>nonstandardlogic/memcached-operator
+/home/serge/go/bin/kustomize build config/default <span class="p">|</span> kubectl apply -f -
 namespace/memcached-operator-system created
 customresourcedefinition.apiextensions.k8s.io/memcacheds.cache.example.com configured
 role.rbac.authorization.k8s.io/memcached-operator-leader-election-role created
@@ -250,77 +717,125 @@ clusterrolebinding.rbac.authorization.k8s.io/memcached-operator-manager-rolebind
 clusterrolebinding.rbac.authorization.k8s.io/memcached-operator-proxy-rolebinding created
 service/memcached-operator-controller-manager-metrics-service created
 deployment.apps/memcached-operator-controller-manager created
-</code></pre>
-<h3 id="check-operator-namespace">Check Operator namespace</h3>
-<pre><code>$ kubectl get pods -n memcached-operator-system
-NAME                                                     READY   STATUS    RESTARTS   AGE
-memcached-operator-controller-manager-686dcfc75d-dvtnm   2/2     Running   0          95s
-</code></pre>
-<h3 id="check-operator-logs">Check Operator logs</h3>
-<pre><code>$ kubectl logs deployment.apps/memcached-operator-controller-manager -n memcached-operator-system -c manager
-</code></pre>
-<h3 id="apply-example-cr">Apply example CR</h3>
-<pre><code>$ kubectl apply -f config/samples/cache_v1_memcached.yaml -n memcached-operator-system
-memcached.cache.example.com/memcached-sample created
-</code></pre>
-<h3 id="check-resources">Check resources</h3>
-<pre><code>$ kubectl get all -n memcached-operator-system
-NAME                                                         READY   STATUS    RESTARTS   AGE
-pod/memcached-operator-controller-manager-686dcfc75d-dvtnm   2/2     Running   0          4m1s
-pod/memcached-sample-9b765dfc8-2pwsm                         1/1     Running   0          93s
+</code></pre></div>
 
-NAME                                                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
-service/memcached-operator-controller-manager-metrics-service   ClusterIP   10.109.157.125   &lt;none&gt;        8443/TCP   4m1s
+
+<h3 id="check-operator-namespace">Check Operator namespace</h3>
+<div class="codehilite"><pre><span></span><code>$ kubectl get pods -n memcached-operator-system
+NAME                                                     READY   STATUS    RESTARTS   AGE
+memcached-operator-controller-manager-686dcfc75d-dvtnm   <span class="m">2</span>/2     Running   <span class="m">0</span>          95s
+</code></pre></div>
+
+
+<h3 id="check-operator-logs">Check Operator logs</h3>
+<div class="codehilite"><pre><span></span><code>$ kubectl logs deployment.apps/memcached-operator-controller-manager -n memcached-operator-system -c manager
+</code></pre></div>
+
+
+<h3 id="apply-example-cr">Apply example CR</h3>
+<div class="codehilite"><pre><span></span><code>$ kubectl apply -f config/samples/cache_v1_memcached.yaml -n memcached-operator-system
+memcached.cache.example.com/memcached-sample created
+</code></pre></div>
+
+
+<h3 id="check-resources">Check resources</h3>
+<div class="codehilite"><pre><span></span><code>$ kubectl get all -n memcached-operator-system
+NAME                                                         READY   STATUS    RESTARTS   AGE
+pod/memcached-operator-controller-manager-686dcfc75d-dvtnm   <span class="m">2</span>/2     Running   <span class="m">0</span>          4m1s
+pod/memcached-sample-9b765dfc8-2pwsm                         <span class="m">1</span>/1     Running   <span class="m">0</span>          93s
+
+NAME                                                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>    AGE
+service/memcached-operator-controller-manager-metrics-service   ClusterIP   <span class="m">10</span>.109.157.125   &lt;none&gt;        <span class="m">8443</span>/TCP   4m1s
 
 NAME                                                    READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/memcached-operator-controller-manager   1/1     1            1           4m1s
-deployment.apps/memcached-sample                        1/1     1            1           93s
+deployment.apps/memcached-operator-controller-manager   <span class="m">1</span>/1     <span class="m">1</span>            <span class="m">1</span>           4m1s
+deployment.apps/memcached-sample                        <span class="m">1</span>/1     <span class="m">1</span>            <span class="m">1</span>           93s
 
 NAME                                                               DESIRED   CURRENT   READY   AGE
-replicaset.apps/memcached-operator-controller-manager-686dcfc75d   1         1         1       4m1s
-replicaset.apps/memcached-sample-9b765dfc8                         1         1         1       93s
-</code></pre>
+replicaset.apps/memcached-operator-controller-manager-686dcfc75d   <span class="m">1</span>         <span class="m">1</span>         <span class="m">1</span>       4m1s
+replicaset.apps/memcached-sample-9b765dfc8                         <span class="m">1</span>         <span class="m">1</span>         <span class="m">1</span>       93s
+</code></pre></div>
+
+
 <h3 id="cleanup-resources">Cleanup resources</h3>
 <p>Now, you can cleanup all by running to delete the CR:</p>
-<pre><code>$ kubectl delete -f config/samples/cache_v1_memcached.yaml
-</code></pre>
+<div class="codehilite"><pre><span></span><code>$ kubectl delete -f config/samples/cache_v1_memcached.yaml
+</code></pre></div>
+
+
 <h3 id="cleanup-resources_1">Cleanup resources</h3>
 <p>Uninstall all operator’s resources and its CRDs:</p>
-<pre><code>$ kustomize build config/default | kubectl delete -f -
+<div class="codehilite"><pre><span></span><code>$ kustomize build config/default <span class="p">|</span> kubectl delete -f -
 </code></pre></div>
-        </div>
+                
+              
+              
+                
 
-        <footer class="col-md-12">
-            <hr>
-                <p>Copyright &copy; 2020 - 2020 Non Standard Logic Ltd</p>
-            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
-        </footer>
-        <script>var base_url = '../..';</script>
-        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-        <script src="../../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form role="form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
-            </div>
+
+              
+            </article>
+          </div>
         </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../../projects/" title="Projects" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Projects
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
     </div>
-</div>
-
-    </body>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 - 2020 Non Standard Logic Ltd
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.df0def68.min.js"></script>
+      <script src="../../assets/javascripts/bundle.ba57d267.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.fae956e7.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
 </html>
