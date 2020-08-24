@@ -10,9 +10,17 @@
     
 
     
+    <url>
+     <loc>/projects/</loc>
+     <lastmod>2020-08-24</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
         
     <url>
-     <loc>/articles/tutorial/</loc>
+     <loc>/articles/k8s-memcached-operator/</loc>
      <lastmod>2020-08-24</lastmod>
      <changefreq>daily</changefreq>
     </url>
