@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Tutorial - Tutorial Create Operator</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+	
+	<script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">Tutorial Create Operator</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                    <li class="active">
+                        <a href="./">Tutorial</a>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="..">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li class="disabled">
+                        <a rel="prev" >
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/nonstandardlogic.github.io/">
+                                <i class="fa fa-github"></i>GitHub
+                        </a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#create-project">Create Project</a></li>
+        <li class="main "><a href="#create-api">Create API</a></li>
+        <li class="main "><a href="#install-kubebuilder">Install Kubebuilder</a></li>
+        <li class="main "><a href="#api-definition">API Definition</a></li>
+        <li class="main "><a href="#generate-crd">Generate CRD</a></li>
+        <li class="main "><a href="#update-cr">Update CR</a></li>
+        <li class="main "><a href="#building-and-pushing-to-docker-registry">Building and pushing to Docker registry</a></li>
+        <li class="main "><a href="#deploy-crds">Deploy CRDS</a></li>
+        <li class="main "><a href="#check-the-operator">Check the operator</a></li>
+        <li class="main "><a href="#check-crds">Check CRDS</a></li>
+        <li class="main "><a href="#running-the-operator">Running the Operator</a></li>
+        <li class="main "><a href="#check-operator-namespace">Check Operator namespace</a></li>
+        <li class="main "><a href="#check-operator-logs">Check Operator logs</a></li>
+        <li class="main "><a href="#apply-example-cr">Apply example CR</a></li>
+        <li class="main "><a href="#check-resources">Check resources</a></li>
+        <li class="main "><a href="#cleanup-resources">Cleanup resources</a></li>
+        <li class="main "><a href="#cleanup-resources_1">Cleanup resources</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h3 id="create-project">Create Project</h3>
+<pre><code>$ mkdir $GOPATH/src/github.com/nonstandardlogic
+$ mkdir $GOPATH/src/github.com/nonstandardlogic/memcached-operator
+$ cd  $GOPATH/src/github.com/memcached-operator
+
+$ operator-sdk init --domain=example.com
+Error: failed to initialize project with version "3-alpha": error finding current repository: could not determine repository path from module data, package data, or by initializing a module: go: cannot determine module path for source directory /home/serge/go/memcached-operator (outside GOPATH, module path must be specified)
+</code></pre>
+<p>Example usage:
+        'go mod init example.com/m' to initialize a v0 or v1 module
+        'go mod init example.com/m/v2' to initialize a v2 module</p>
+<p>Then</p>
+<pre><code>$ go mod init example.com/m/v2
+go: creating new go.mod: module example.com/m/v2
+</code></pre>
+<p>Create the project</p>
+<pre><code>$ operator-sdk init --domain example.com --license apache2 --owner "NSL Team"
+Writing scaffold for you to edit...
+Get controller runtime:
+$ go get sigs.k8s.io/controller-runtime@v0.6.2
+Update go.mod:
+$ go mod tidy
+Running make:
+$ make
+/home/serge/go/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+go fmt ./...
+go vet ./...
+go build -o bin/manager main.go
+Next: define a resource with:
+$ operator-sdk create api
+</code></pre>
+<h3 id="create-api">Create API</h3>
+<pre><code>$ operator-sdk create api --group cache --version v1 --kind Memcached --resource=true --controller=true
+Writing scaffold for you to edit...
+api/v1/memcached_types.go
+controllers/memcached_controller.go
+Running make:
+$ make
+/home/serge/go/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+go fmt ./...
+go vet ./...
+go build -o bin/manager main.go
+
+
+$ make manifests
+/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+</code></pre>
+<h3 id="install-kubebuilder">Install Kubebuilder</h3>
+<p>( https://book.kubebuilder.io/quick-start.html)</p>
+<pre><code>s$ os=$(go env GOOS)
+$ arch=$(go env GOARCH)
+$ curl -L https://go.kubebuilder.io/dl/2.3.1/${os}/${arch} | tar -xz -C /tmp/
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                Dload  Upload   Total   Spent    Left  Speed
+100    68  100    68    0     0    163      0 --:--:-- --:--:-- --:--:--   163
+100   124  100   124    0     0    272      0 --:--:-- --:--:-- --:--:--   272
+100   649  100   649    0     0    719      0 --:--:-- --:--:-- --:--:--  2021
+100 54.8M  100 54.8M    0     0  3701k      0  0:00:15  0:00:15 --:--:-- 4395k
+
+$ sudo mv /tmp/kubebuilder_2.3.1_${os}_${arch} /usr/local/kubebuilder
+$ export PATH=$PATH:/usr/local/kubebuilder/bin
+</code></pre>
+<h3 id="api-definition">API Definition</h3>
+<p>Update the api/v1alpha1/memcached_types.go file:
+    // MemcachedSpec defines the desired state of Memcached
+    type MemcachedSpec struct {
+        // +kubebuilder:validation:Minimum=0
+        // Size is the size of the memcached deployment
+        Size int32 <code>json:"size"</code>
+    }</p>
+<pre><code>// MemcachedStatus defines the observed state of Memcached
+type MemcachedStatus struct {
+    // Nodes are the names of the memcached pods
+    Nodes []string `json:"nodes"`
+}
+</code></pre>
+<h3 id="generate-crd">Generate CRD</h3>
+<pre><code>$ make manifests
+/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+</code></pre>
+<h3 id="update-cr">Update CR</h3>
+<p>update the CR sample in <code>config/samples/cache_v1_memcached.yaml</code> to set the attribute defined:</p>
+<pre><code>apiVersion: cache.example.com/v1
+kind: Memcached
+metadata:
+name: memcached-sample
+spec:
+# Add fields here
+size: 1
+</code></pre>
+<h3 id="building-and-pushing-to-docker-registry">Building and pushing to Docker registry</h3>
+<pre><code>$ make docker-build docker-push IMG=nonstandardlogic/memcached-operator
+/home/serge/go/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+go fmt ./...
+go vet ./...
+/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+go test ./... -coverprofile cover.out
+?       github.com/nonstandardlogic/memcached-operator  [no test files]
+?       github.com/nonstandardlogic/memcached-operator/api/v1   [no test files]
+ok      github.com/nonstandardlogic/memcached-operator/controllers      5.131s  coverage: 0.0% of statements
+docker build . -t nonstandardlogic/memcached-operator
+Sending build context to Docker daemon  44.48MB
+Step 1/14 : FROM golang:1.13 as builder
+---&gt; d6f3656320fe
+Step 2/14 : WORKDIR /workspace
+...
+1d44b27e08d8: Pushed
+84ff92691f90: Pushed
+d72a74c56330: Pushed
+latest: digest: sha256:b7074c024bfa691255788566b768a3f3cb0b4bc8e2e0062cb8d6dbd0c617749a size: 945
+</code></pre>
+<h3 id="deploy-crds">Deploy CRDS</h3>
+<pre><code>$ make install
+/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+/home/serge/go/bin/kustomize build config/crd | kubectl apply -f -
+customresourcedefinition.apiextensions.k8s.io/memcacheds.cache.example.com created
+</code></pre>
+<h3 id="check-the-operator">Check the operator</h3>
+<p>$ kubectl api-resources | grep memcached
+memcacheds                                     cache.example.com              true         Memcached</p>
+<h3 id="check-crds">Check CRDS</h3>
+<p>$ kubectl describe crds memcacheds</p>
+<h3 id="running-the-operator">Running the Operator</h3>
+<pre><code>$ make deploy IMG=nonstandardlogic/memcached-operator
+/home/serge/go/bin/controller-gen "crd:trivialVersions=true" rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+cd config/manager &amp;&amp; /home/serge/go/bin/kustomize edit set image controller=nonstandardlogic/memcached-operator
+/home/serge/go/bin/kustomize build config/default | kubectl apply -f -
+namespace/memcached-operator-system created
+customresourcedefinition.apiextensions.k8s.io/memcacheds.cache.example.com configured
+role.rbac.authorization.k8s.io/memcached-operator-leader-election-role created
+clusterrole.rbac.authorization.k8s.io/memcached-operator-manager-role created
+clusterrole.rbac.authorization.k8s.io/memcached-operator-proxy-role created
+clusterrole.rbac.authorization.k8s.io/memcached-operator-metrics-reader created
+rolebinding.rbac.authorization.k8s.io/memcached-operator-leader-election-rolebinding created
+clusterrolebinding.rbac.authorization.k8s.io/memcached-operator-manager-rolebinding created
+clusterrolebinding.rbac.authorization.k8s.io/memcached-operator-proxy-rolebinding created
+service/memcached-operator-controller-manager-metrics-service created
+deployment.apps/memcached-operator-controller-manager created
+</code></pre>
+<h3 id="check-operator-namespace">Check Operator namespace</h3>
+<pre><code>$ kubectl get pods -n memcached-operator-system
+NAME                                                     READY   STATUS    RESTARTS   AGE
+memcached-operator-controller-manager-686dcfc75d-dvtnm   2/2     Running   0          95s
+</code></pre>
+<h3 id="check-operator-logs">Check Operator logs</h3>
+<pre><code>$ kubectl logs deployment.apps/memcached-operator-controller-manager -n memcached-operator-system -c manager
+</code></pre>
+<h3 id="apply-example-cr">Apply example CR</h3>
+<pre><code>$ kubectl apply -f config/samples/cache_v1_memcached.yaml -n memcached-operator-system
+memcached.cache.example.com/memcached-sample created
+</code></pre>
+<h3 id="check-resources">Check resources</h3>
+<pre><code>$ kubectl get all -n memcached-operator-system
+NAME                                                         READY   STATUS    RESTARTS   AGE
+pod/memcached-operator-controller-manager-686dcfc75d-dvtnm   2/2     Running   0          4m1s
+pod/memcached-sample-9b765dfc8-2pwsm                         1/1     Running   0          93s
+
+NAME                                                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+service/memcached-operator-controller-manager-metrics-service   ClusterIP   10.109.157.125   &lt;none&gt;        8443/TCP   4m1s
+
+NAME                                                    READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/memcached-operator-controller-manager   1/1     1            1           4m1s
+deployment.apps/memcached-sample                        1/1     1            1           93s
+
+NAME                                                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/memcached-operator-controller-manager-686dcfc75d   1         1         1       4m1s
+replicaset.apps/memcached-sample-9b765dfc8                         1         1         1       93s
+</code></pre>
+<h3 id="cleanup-resources">Cleanup resources</h3>
+<p>Now, you can cleanup all by running to delete the CR:</p>
+<pre><code>$ kubectl delete -f config/samples/cache_v1_memcached.yaml
+</code></pre>
+<h3 id="cleanup-resources_1">Cleanup resources</h3>
+<p>Uninstall all operator’s resources and its CRDs:</p>
+<pre><code>$ kustomize build config/default | kubectl delete -f -
+</code></pre></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
