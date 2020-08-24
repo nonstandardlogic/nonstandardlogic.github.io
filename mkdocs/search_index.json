@@ -2,13 +2,8 @@
     "docs": [
         {
             "location": "/",
-            "text": "Index",
+            "text": "Index page",
             "title": "Home"
-        },
-        {
-            "location": "/#index",
-            "text": "",
-            "title": "Index"
         },
         {
             "location": "/projects/",
