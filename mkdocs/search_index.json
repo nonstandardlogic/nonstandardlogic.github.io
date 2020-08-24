@@ -7,12 +7,7 @@
         },
         {
             "location": "/projects/",
-            "text": "Projects",
-            "title": "Projects"
-        },
-        {
-            "location": "/projects/#projects",
-            "text": "",
+            "text": "Projects page",
             "title": "Projects"
         },
         {
